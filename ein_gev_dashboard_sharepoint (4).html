@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>עין גב – ניהול קבוצות</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg:#f4f6fa;--surface:#fff;--surface2:#f8f9fc;--border:#e8eaf0;--border2:#d1d5e0;
+  --text:#1a1d2e;--text2:#5a6075;--text3:#9ba3b8;
+  --accent:#2563eb;--accent-l:#eff4ff;
+  --green:#16a34a;--green-l:#f0fdf4;
+  --yellow:#d97706;--yellow-l:#fffbeb;
+  --red:#dc2626;--red-l:#fff5f5;
+  --orange:#ea580c;--orange-l:#fff7ed;
+  --purple:#7c3aed;--purple-l:#f5f3ff;
+  --teal:#0d9488;--teal-l:#f0fdfa;
+  --indigo:#4338ca;--indigo-l:#eef2ff;
+  --font:'Heebo',sans-serif;
+  --r:12px;--r-lg:16px;
+  --sh:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --sh-md:0 4px 16px rgba(0,0,0,.09),0 1px 4px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;}
+
+/* ── HEADER ── */
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:200;box-shadow:var(--sh);}
+.hlogo{display:flex;align-items:center;gap:12px;}
+.logo-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.3);}
+.htitle{font-size:15px;font-weight:700;}.hsub{font-size:11px;color:var(--text3);}
+.hright{display:flex;gap:8px;}
+
+/* ── BUTTONS ── */
+.btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;font-family:var(--font);cursor:pointer;border:1px solid var(--border2);background:var(--surface);color:var(--text2);transition:all .15s;display:inline-flex;align-items:center;gap:5px;box-shadow:var(--sh);}
+.btn:hover{background:var(--surface2);color:var(--text);}
+.btn-primary{background:linear-gradient(135deg,#2563eb,#1d4ed8);border-color:#2563eb;color:#fff;box-shadow:0 2px 8px rgba(37,99,235,.25);}
+.btn-primary:hover{background:linear-gradient(135deg,#1d4ed8,#1e40af);}
+.btn-sm{padding:5px 10px;font-size:11px;}
+
+/* ── TABS ── */
+.tabs-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;display:flex;overflow-x:auto;}
+.tab{padding:13px 18px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+.tab:hover{color:var(--text2);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600;}
+.tab-badge{background:var(--red);color:#fff;border-radius:10px;font-size:10px;font-weight:700;padding:1px 6px;min-width:18px;display:inline-flex;align-items:center;justify-content:center;}
+
+/* ── LAYOUT ── */
+.main{padding:22px 28px;max-width:1700px;}
+.section{display:none;}.section.active{display:block;}
+
+/* ── DATE FILTER TOP BAR ── */
+.top-date-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:11px 16px;box-shadow:var(--sh);}
+.preset-group{display:flex;gap:5px;}
+.preset-btn{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;font-family:var(--font);cursor:pointer;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text2);transition:all .15s;white-space:nowrap;}
+.preset-btn:hover{border-color:var(--accent);color:var(--accent);}
+.preset-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 2px 6px rgba(37,99,235,.2);}
+.date-sep{color:var(--border2);margin:0 2px;}
+.date-range-row{display:flex;align-items:center;gap:7px;margin-right:auto;}
+.date-range-lbl{font-size:12px;color:var(--text3);font-weight:500;white-space:nowrap;}
+.date-inp{background:var(--surface2);border:1px solid var(--border2);color:var(--text);border-radius:7px;padding:5px 9px;font-family:var(--font);font-size:12px;outline:none;transition:border .15s;}
+.date-inp:focus{border-color:var(--accent);}
+.date-count{font-size:12px;color:var(--text3);white-space:nowrap;}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:22px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;box-shadow:var(--sh);transition:box-shadow .2s,transform .2s;}
+.kpi:hover{box-shadow:var(--sh-md);transform:translateY(-1px);}
+.kpi-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;margin-bottom:10px;}
+.kpi-label{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;}
+.kpi-val{font-size:26px;font-weight:800;line-height:1;margin-bottom:4px;}
+.kpi-sub{font-size:11px;color:var(--text3);}
+.kpi.blue .kpi-icon{background:var(--accent-l);color:var(--accent);}.kpi.blue .kpi-val{color:var(--accent);}
+.kpi.green .kpi-icon{background:var(--green-l);color:var(--green);}.kpi.green .kpi-val{color:var(--green);}
+.kpi.yellow .kpi-icon{background:var(--yellow-l);color:var(--yellow);}.kpi.yellow .kpi-val{color:var(--yellow);}
+.kpi.red .kpi-icon{background:var(--red-l);color:var(--red);}.kpi.red .kpi-val{color:var(--red);}
+.kpi.orange .kpi-icon{background:var(--orange-l);color:var(--orange);}.kpi.orange .kpi-val{color:var(--orange);}
+.kpi.purple .kpi-icon{background:var(--purple-l);color:var(--purple);}.kpi.purple .kpi-val{color:var(--purple);}
+.kpi.teal .kpi-icon{background:var(--teal-l);color:var(--teal);}.kpi.teal .kpi-val{color:var(--teal);}
+.kpi.indigo .kpi-icon{background:var(--indigo-l);color:var(--indigo);}.kpi.indigo .kpi-val{color:var(--indigo);}
+
+/* ── CHARTS ── */
+.charts-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:22px;}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh);}
+.chart-title{font-size:13px;font-weight:700;margin-bottom:2px;}
+.chart-sub{font-size:11px;color:var(--text3);margin-bottom:14px;}
+.chart-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);}
+.legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+.donut-wrap{position:relative;}
+.donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;}
+.donut-center-val{font-size:20px;font-weight:800;color:var(--text);}
+.donut-center-lbl{font-size:10px;color:var(--text3);}
+
+/* ── SOURCE PILLS ── */
+.source-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;}
+.source-pill{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 14px;font-size:13px;box-shadow:var(--sh);}
+.source-pill-dot{width:9px;height:9px;border-radius:50%;}
+.source-pill-count{font-weight:800;font-size:17px;}
+
+/* ── ALERT ── */
+.alerts-bar{background:var(--red-l);border:1px solid rgba(220,38,38,.2);border-right:4px solid var(--red);border-radius:var(--r);padding:12px 16px;margin-bottom:18px;display:flex;align-items:flex-start;gap:10px;}
+.alert-dismiss{font-size:11px;cursor:pointer;padding:3px 9px;border-radius:6px;border:1px solid rgba(220,38,38,.25);background:none;color:var(--red);font-family:var(--font);flex-shrink:0;}
+
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.filter-select{background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:7px 10px;font-family:var(--font);font-size:12px;cursor:pointer;outline:none;box-shadow:var(--sh);}
+.filter-select:focus{border-color:var(--accent);}
+.search-wrap{position:relative;flex:1;min-width:180px;}
+.search-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px;pointer-events:none;}
+.search-input{width:100%;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:7px 30px 7px 10px;font-family:var(--font);font-size:12px;outline:none;box-shadow:var(--sh);}
+.search-input:focus{border-color:var(--accent);}
+.search-input::placeholder{color:var(--text3);}
+
+/* ── STAY DATE FILTER ── */
+.stay-filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.stay-filter-lbl{font-size:12px;color:var(--text2);font-weight:600;}
+
+/* ── TABLE ── */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh);}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--surface2);}
+th{padding:10px 12px;text-align:right;font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:11px 12px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#f8f9fc;}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap;}
+.badge-dot{width:5px;height:5px;border-radius:50%;}
+.badge.quote{background:#eff4ff;color:#3730a3;border:1px solid #c7d2fe;}.badge.quote .badge-dot{background:#6366f1;}
+.badge.precontract{background:#fef3c7;color:#92400e;border:1px solid #fde68a;}.badge.precontract .badge-dot{background:#f59e0b;}
+.badge.signed{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;}.badge.signed .badge-dot{background:#22c55e;}
+.badge.closed{background:#f0fdfa;color:#0f766e;border:1px solid #99f6e4;}.badge.closed .badge-dot{background:#0d9488;}
+.badge.lost{background:#f9fafb;color:#6b7280;border:1px solid #e5e7eb;}.badge.lost .badge-dot{background:#9ca3af;}
+.badge.cancelled{background:#fff5f5;color:#b91c1c;border:1px solid #fecaca;}.badge.cancelled .badge-dot{background:#ef4444;}
+
+.src-badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap;}
+.src-miri{background:#fdf4ff;color:#7e22ce;}.src-direct{background:#f0fdfa;color:#0f766e;}.src-agent{background:#eff4ff;color:#1d4ed8;}.src-web{background:#fff7ed;color:#c2410c;}
+
+/* followup */
+.fu-ok{color:var(--green);font-size:14px;font-weight:700;}
+.fu-warn{color:var(--yellow);font-size:11px;font-weight:600;}
+.fu-overdue{color:var(--red);font-size:11px;font-weight:700;animation:blink 1.6s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.45}}
+
+.row-actions{display:flex;gap:4px;}
+.icon-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border2);background:none;color:var(--text3);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.icon-btn:hover{background:var(--surface2);color:var(--text);}
+.icon-btn.del:hover{background:var(--red-l);color:var(--red);}
+
+.row-cancelled td{opacity:.5;}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,20,40,.38);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;width:min(780px,96vw);max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.14);}
+.modal-title{font-size:18px;font-weight:800;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.modal-close{position:absolute;top:20px;left:22px;width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:none;color:var(--text3);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{background:var(--surface2);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group.full{grid-column:1/-1;}
+.form-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;}
+.form-input,.form-select,.form-textarea{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 11px;font-family:var(--font);font-size:13px;outline:none;transition:border .15s,box-shadow .15s;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.09);}
+.form-textarea{min-height:72px;resize:vertical;}
+.form-section-hdr{margin:16px 0 8px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);padding-bottom:6px;grid-column:1/-1;}
+
+/* multi-select checkboxes */
+.multi-check-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.check-opt{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:8px 11px;cursor:pointer;transition:all .15s;font-size:12px;color:var(--text2);}
+.check-opt:hover{border-color:var(--accent);}
+.check-opt:has(input:checked){border-color:var(--accent);background:var(--accent-l);color:var(--text);}
+.check-opt input[type=checkbox]{accent-color:var(--accent);}
+
+/* checkbox row */
+.form-checkbox-row{display:flex;align-items:center;gap:9px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:10px 13px;cursor:pointer;transition:all .15s;font-size:13px;color:var(--text2);grid-column:1/-1;}
+.form-checkbox-row:has(input:checked){border-color:var(--accent);background:var(--accent-l);color:var(--text);}
+.form-checkbox-row input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;}
+
+/* lost reasons */
+.lost-reason-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.lost-opt{display:flex;align-items:center;gap:7px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;cursor:pointer;transition:all .15s;font-size:12px;color:var(--text2);}
+.lost-opt:hover{border-color:var(--accent);}
+.lost-opt:has(input:checked){border-color:var(--red);background:var(--red-l);color:var(--text);}
+.lost-opt input[type=radio]{accent-color:var(--red);}
+
+.modal-footer{display:flex;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+
+/* ── DRAWER ── */
+.drawer{display:none;position:fixed;top:0;left:0;bottom:0;width:min(560px,100vw);background:var(--surface);border-left:1px solid var(--border);z-index:500;overflow-y:auto;padding:28px;box-shadow:-8px 0 40px rgba(0,0,0,.1);}
+.drawer.open{display:block;}
+.drawer-close{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:none;color:var(--text3);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;}
+.drawer-close:hover{background:var(--surface2);}
+.detail-name{font-size:20px;font-weight:800;margin-bottom:5px;}
+.detail-meta{margin-bottom:18px;display:flex;gap:7px;flex-wrap:wrap;}
+.detail-section{margin-bottom:18px;}
+.detail-section-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;border-bottom:1px solid var(--border);padding-bottom:6px;}
+.detail-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;border-bottom:1px solid rgba(0,0,0,.03);}
+.detail-row-label{color:var(--text3);}
+.timeline{display:flex;flex-direction:column;}
+.tl-item{display:flex;gap:10px;padding-bottom:15px;position:relative;}
+.tl-item::before{content:'';position:absolute;right:6px;top:20px;bottom:0;width:1px;background:var(--border);}
+.tl-item:last-child::before{display:none;}
+.tl-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--accent);background:var(--surface);flex-shrink:0;margin-top:2px;}
+.tl-action{font-size:12px;font-weight:600;}.tl-time{font-size:11px;color:var(--text3);margin-top:1px;}
+
+/* ── SETTINGS ── */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.settings-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;box-shadow:var(--sh);}
+.settings-card-title{font-size:14px;font-weight:700;margin-bottom:13px;}
+.tag-list{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:500;background:var(--surface2);border:1px solid var(--border);color:var(--text2);}
+.tag-del{cursor:pointer;color:var(--text3);font-size:12px;line-height:1;}.tag-del:hover{color:var(--red);}
+.tag-add{display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
+.tag-add input{flex:1;min-width:120px;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:6px 10px;font-family:var(--font);font-size:12px;outline:none;}
+.tag-add input:focus{border-color:var(--accent);}
+
+/* followup settings */
+.fu-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;}
+.fu-card-title{font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.fu-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--text2);}
+.fu-row input[type=number]{width:60px;background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-family:var(--font);font-size:12px;outline:none;}
+.fu-row select{background:var(--surface);border:1px solid var(--border2);color:var(--text);border-radius:6px;padding:4px 8px;font-family:var(--font);font-size:12px;outline:none;}
+
+/* pagination */
+.pagination{display:flex;align-items:center;gap:5px;justify-content:center;margin-top:16px;}
+.page-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;font-family:var(--font);box-shadow:var(--sh);transition:all .15s;}
+.page-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.page-btn:hover:not(.active){background:var(--surface2);}
+
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+@media(max-width:960px){
+  .charts-grid{grid-template-columns:1fr;}
+  .kpi-grid{grid-template-columns:repeat(3,1fr);}
+  .form-grid{grid-template-columns:1fr;}
+  .settings-grid{grid-column:1/-1;grid-template-columns:1fr;}
+  .main{padding:14px;}
+  .header,.tabs-bar{padding:0 14px;}
+  .multi-check-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="hlogo">
+    <div class="logo-mark">עג</div>
+    <div><div class="htitle">כפר הנופש עין גב</div><div class="hsub">מערכת ניהול קבוצות</div></div>
+  </div>
+  <div class="hright">
+    <span id="sp-status"></span>
+    <button class="btn" onclick="reconnectSP()" title="רענן נתונים מ-SharePoint">🔄 רענן</button>
+    <button class="btn btn-primary" onclick="openAddModal()">＋ קבוצה חדשה</button>
+  </div>
+</header>
+
+<!-- Loading overlay -->
+<div id="loading-overlay" style="display:none;position:fixed;inset:0;background:rgba(255,255,255,.85);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:12px">
+  <div style="width:44px;height:44px;border:4px solid #e8eaf0;border-top-color:#2563eb;border-radius:50%;animation:spin .8s linear infinite"></div>
+  <div style="font-size:14px;font-weight:600;color:#5a6075">מתחבר ל-SharePoint...</div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<nav class="tabs-bar">
+  <div class="tab active" onclick="switchTab('dashboard')">📊 דשבורד</div>
+  <div class="tab" onclick="switchTab('groups')">👥 קבוצות <span class="tab-badge" id="badge-fu">0</span></div>
+  <div class="tab" onclick="switchTab('settings')">⚙️ הגדרות</div>
+</nav>
+
+<div class="main">
+
+<!-- ══════════ DASHBOARD ══════════ -->
+<div id="tab-dashboard" class="section active">
+
+  <!-- Date filter -->
+  <div class="top-date-bar">
+    <div class="preset-group" id="db-presets">
+      <button class="preset-btn active" onclick="dbSetPreset('month')">החודש</button>
+      <button class="preset-btn" onclick="dbSetPreset('quarter')">רבעון נוכחי</button>
+      <button class="preset-btn" onclick="dbSetPreset('year')">השנה</button>
+      <button class="preset-btn" onclick="dbSetPreset('all')">כל הזמנים</button>
+    </div>
+    <span class="date-sep">|</span>
+    <div class="date-range-row">
+      <span class="date-range-lbl">תאריך בקשה:</span>
+      <input type="date" class="date-inp" id="db-date-from" onchange="dbOnDateChange()">
+      <span style="color:var(--text3)">—</span>
+      <input type="date" class="date-inp" id="db-date-to" onchange="dbOnDateChange()">
+    </div>
+    <span class="date-count" id="db-count"></span>
+  </div>
+
+  <!-- Alerts -->
+  <div class="alerts-bar" id="db-alerts" style="display:none">
+    <span style="font-size:17px;flex-shrink:0">⚠️</span>
+    <div style="font-size:13px;flex:1" id="db-alerts-text"></div>
+    <button class="alert-dismiss" onclick="document.getElementById('db-alerts').style.display='none'">סגור</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <!-- Charts -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">סטאטוס קבוצות</div>
+      <div class="chart-sub">פילוח לפי מצב עסקה</div>
+      <div class="donut-wrap" style="height:210px;position:relative">
+        <canvas id="chart-status" role="img" aria-label="פילוח סטאטוסים">פילוח סטאטוסים</canvas>
+        <div class="donut-center"><div class="donut-center-val" id="donut-status-val">0</div><div class="donut-center-lbl">סה"כ</div></div>
+      </div>
+      <div class="chart-legend" id="legend-status"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">מקורות הגעה</div>
+      <div class="chart-sub">פילוח לפי ערוץ</div>
+      <div class="donut-wrap" style="height:210px;position:relative">
+        <canvas id="chart-sources" role="img" aria-label="מקורות הגעה">מקורות</canvas>
+        <div class="donut-center"><div class="donut-center-val" id="donut-src-val">0</div><div class="donut-center-lbl">פניות</div></div>
+      </div>
+      <div class="chart-legend" id="legend-src"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">סיבות אי-סגירה</div>
+      <div class="chart-sub" id="lost-sub">—</div>
+      <div style="position:relative;height:220px"><canvas id="chart-lost" role="img" aria-label="סיבות אי סגירה">סיבות</canvas></div>
+    </div>
+  </div>
+
+  <!-- Source pills -->
+  <div class="source-summary" id="source-summary"></div>
+</div>
+
+<!-- ══════════ GROUPS ══════════ -->
+<div id="tab-groups" class="section">
+
+  <!-- Request date filter -->
+  <div class="top-date-bar">
+    <div class="preset-group" id="tbl-presets">
+      <button class="preset-btn active" onclick="tblSetPreset('month')">החודש</button>
+      <button class="preset-btn" onclick="tblSetPreset('quarter')">רבעון</button>
+      <button class="preset-btn" onclick="tblSetPreset('year')">השנה</button>
+      <button class="preset-btn" onclick="tblSetPreset('all')">כל הזמנים</button>
+    </div>
+    <span class="date-sep">|</span>
+    <div class="date-range-row">
+      <span class="date-range-lbl">תאריך בקשה:</span>
+      <input type="date" class="date-inp" id="tbl-from" onchange="tblDateChange()">
+      <span style="color:var(--text3)">—</span>
+      <input type="date" class="date-inp" id="tbl-to" onchange="tblDateChange()">
+    </div>
+    <span class="date-count" id="tbl-count"></span>
+  </div>
+
+  <!-- Stay date filter -->
+  <div class="stay-filter-bar">
+    <span class="stay-filter-lbl">📅 תאריך שהייה:</span>
+    <input type="date" class="date-inp" id="stay-from" onchange="currentPage=1;renderTable()">
+    <span style="color:var(--text3)">—</span>
+    <input type="date" class="date-inp" id="stay-to" onchange="currentPage=1;renderTable()">
+    <button class="btn btn-sm" onclick="document.getElementById('stay-from').value='';document.getElementById('stay-to').value='';currentPage=1;renderTable()">נקה</button>
+  </div>
+
+  <!-- Other filters -->
+  <div class="filter-bar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" class="search-input" placeholder="חיפוש שם, סוכן, איש קשר..." id="search-input" oninput="currentPage=1;renderTable()">
+    </div>
+    <select class="filter-select" id="filter-status" onchange="currentPage=1;renderTable()">
+      <option value="">כל הסטאטוסים</option>
+      <option value="quote">נשלחה הצעת מחיר</option>
+      <option value="precontract">טרום הסכם</option>
+      <option value="signed">הסכם חתום</option>
+      <option value="closed">קבוצה סגורה</option>
+      <option value="lost">לא נסגרה</option>
+      <option value="cancelled">בוטל לאחר הסכם</option>
+    </select>
+    <select class="filter-select" id="filter-source" onchange="currentPage=1;renderTable()">
+      <option value="">כל המקורות</option>
+      <option value="miri">מירי יוסף</option>
+      <option value="direct">ישיר</option>
+      <option value="agent">סוכן / מפיק</option>
+    </select>
+    <select class="filter-select" id="filter-lr" onchange="currentPage=1;renderTable()">
+      <option value="">כל סיבות האי-סגירה</option>
+    </select>
+    <select class="filter-select" id="filter-fu" onchange="currentPage=1;renderTable()">
+      <option value="">כל הפולו-אפים</option>
+      <option value="overdue">דחוף</option>
+      <option value="warn">ממתין</option>
+    </select>
+    <button class="btn" onclick="exportCSV()">📥 ייצוא CSV</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>קבוצה / ארגון</th>
+        <th>מקור</th>
+        <th>תאריך בקשה</th>
+        <th>תאריך שהייה</th>
+        <th style="text-align:center">לילות</th>
+        <th style="text-align:center">חדרים</th>
+        <th style="text-align:center">אורחים</th>
+        <th>סטאטוס</th>
+        <th>פולו-אפ</th>
+        <th>סיבת אי-סגירה</th>
+        <th>הערות</th>
+        <th>פעולות</th>
+      </tr></thead>
+      <tbody id="groups-tbody"></tbody>
+    </table>
+  </div>
+  <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- ══════════ SETTINGS ══════════ -->
+<div id="tab-settings" class="section">
+  <div style="font-size:17px;font-weight:700;margin-bottom:20px">הגדרות מערכת</div>
+  <div class="settings-grid">
+
+    <div class="settings-card">
+      <div class="settings-card-title">📋 סטאטוסים</div>
+      <div class="tag-list" id="tags-status"></div>
+      <div style="font-size:12px;color:var(--text3)">סטאטוסים קבועים – לא ניתנים לעריכה.</div>
+    </div>
+
+    <div class="settings-card">
+      <div class="settings-card-title">📍 מקורות הגעה</div>
+      <div class="tag-list" id="tags-source"></div>
+      <div class="tag-add">
+        <input type="text" id="new-source" placeholder="מקור חדש...">
+        <button class="btn btn-primary btn-sm" onclick="addTag('source')">הוסף</button>
+      </div>
+    </div>
+
+    <div class="settings-card" style="grid-column:1/-1">
+      <div class="settings-card-title">❌ סיבות אי-סגירה</div>
+      <div class="tag-list" id="tags-lr"></div>
+      <div class="tag-add">
+        <input type="text" id="new-lr" placeholder="סיבה חדשה...">
+        <button class="btn btn-primary btn-sm" onclick="addTag('lr')">הוסף</button>
+      </div>
+    </div>
+
+    <div class="settings-card" style="grid-column:1/-1">
+      <div class="settings-card-title">⏰ הגדרות פולו-אפ</div>
+      <div id="fu-settings-container"></div>
+      <button class="btn btn-sm" style="margin-top:10px" onclick="addFuRule()">＋ הוסף פולו-אפ</button>
+    </div>
+
+    <div class="settings-card" style="grid-column:1/-1">
+      <div class="settings-card-title">🏠 סוגי חדרים</div>
+      <div class="tag-list" id="tags-rooms"></div>
+      <div class="tag-add">
+        <input type="text" id="new-room" placeholder="סוג חדר חדש...">
+        <button class="btn btn-primary btn-sm" onclick="addTag('room')">הוסף</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- .main -->
+
+<!-- ══════════ ADD/EDIT MODAL ══════════ -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-modal')">✕</button>
+    <div class="modal-title" id="modal-title">הוספת קבוצה חדשה</div>
+    <div class="form-grid">
+
+      <div class="form-group"><label class="form-label">שם קבוצה / ארגון *</label><input type="text" class="form-input" id="f-name" placeholder="חברת..."></div>
+      <div class="form-group"><label class="form-label">איש קשר</label><input type="text" class="form-input" id="f-contact" placeholder="שם"></div>
+      <div class="form-group"><label class="form-label">טלפון</label><input type="text" class="form-input" id="f-phone" placeholder="050-0000000"></div>
+      <div class="form-group"><label class="form-label">אימייל</label><input type="email" class="form-input" id="f-email" placeholder="name@co.il"></div>
+
+      <div class="form-group"><label class="form-label">מקור הגעה *</label>
+        <select class="form-select" id="f-source">
+          <option value="miri">מירי יוסף</option>
+          <option value="direct">ישיר</option>
+          <option value="agent">סוכן / מפיק</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">שם הסוכן / מפיק</label><input type="text" class="form-input" id="f-agent" placeholder="אם רלוונטי"></div>
+
+      <!-- web contact checkbox -->
+      <label class="form-checkbox-row">
+        <input type="checkbox" id="f-web-contact">
+        <span>הגיע דרך טופס צור קשר באתר הבית</span>
+      </label>
+
+      <div class="form-section-hdr">פרטי שהייה</div>
+
+      <div class="form-group"><label class="form-label">תאריך בקשה</label><input type="date" class="form-input" id="f-req-date"></div>
+      <div class="form-group"><label class="form-label">תאריך שהייה מבוקש</label><input type="date" class="form-input" id="f-stay-date"></div>
+      <div class="form-group"><label class="form-label">מספר לילות</label><input type="number" class="form-input" id="f-nights" placeholder="2" min="1"></div>
+      <div class="form-group"><label class="form-label">מספר חדרים</label><input type="number" class="form-input" id="f-rooms" placeholder="10" min="1"></div>
+      <div class="form-group"><label class="form-label">מספר אורחים</label><input type="number" class="form-input" id="f-guests" placeholder="40" min="1"></div>
+
+      <div class="form-section-hdr">סוג חדרים מבוקש (ניתן לבחור מספר)</div>
+      <div class="multi-check-grid full" id="room-type-checks"></div>
+
+      <div class="form-section-hdr">הצעת מחיר</div>
+      <div class="form-group"><label class="form-label">צפי הכנסה – לינה (₪)</label><input type="number" class="form-input" id="f-price-lodging" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">צפי הכנסה – תוספות (₪)</label><input type="number" class="form-input" id="f-price-extras" placeholder="0"></div>
+
+      <div class="form-section-hdr">סטאטוס ופולו-אפ</div>
+
+      <div class="form-group"><label class="form-label">סטאטוס *</label>
+        <select class="form-select" id="f-status" onchange="toggleLostReason()">
+          <option value="quote">נשלחה הצעת מחיר</option>
+          <option value="precontract">טרום הסכם</option>
+          <option value="signed">הסכם חתום</option>
+          <option value="closed">קבוצה סגורה</option>
+          <option value="lost">לא נסגרה</option>
+          <option value="cancelled">בוטל לאחר הסכם</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">תאריך שינוי סטאטוס</label><input type="date" class="form-input" id="f-status-date"></div>
+
+      <div id="lost-section" style="display:none;grid-column:1/-1">
+        <div class="form-section-hdr" style="margin-top:0">סיבת אי-סגירה</div>
+        <div class="lost-reason-grid" id="lost-reason-grid"></div>
+      </div>
+
+      <!-- Dept instructions checkbox -->
+      <label class="form-checkbox-row" id="dept-instructions-row">
+        <input type="checkbox" id="f-dept-instructions">
+        <span>✅ נשלחו הנחיות למחלקות</span>
+      </label>
+
+      <div class="form-group full"><label class="form-label">הערות</label><textarea class="form-textarea" id="f-notes" placeholder="הערות נוספות..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="saveGroup()">💾 שמור</button>
+      <button class="btn" onclick="closeModal('add-modal')">ביטול</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL DRAWER -->
+<div class="drawer" id="detail-drawer">
+  <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  <div id="drawer-content"></div>
+</div>
+
+<script>
+// ══════════════════════ DEFAULTS ══════════════════════
+const DEF_SETTINGS = {
+  statusLabels: {
+    quote:'נשלחה הצעת מחיר',
+    precontract:'טרום הסכם',
+    signed:'הסכם חתום',
+    closed:'קבוצה סגורה',
+    lost:'לא נסגרה',
+    cancelled:'בוטל לאחר הסכם'
+  },
+  sourceLabels: {
+    miri:'מירי יוסף',
+    direct:'ישיר',
+    agent:'סוכן / מפיק'
+  },
+  sources: ['miri','direct','agent'],
+  roomTypes: ['וילה','דירה','חדר ים','חדר נוף','חדר מלון'],
+  lostReasons: [
+    {id:'price',label:'עלות גבוהה'},
+    {id:'avail',label:'חוסר זמינות תאריכים'},
+    {id:'capacity',label:'כמות אנשים חורגת'},
+    {id:'policy',label:'לא תואם נהלי המקום'},
+    {id:'other',label:'אחר'}
+  ],
+  fuRules: [
+    {id:'fu1',label:'פולו-אפ הצעת מחיר',trigger:'quote',hours:48,unit:'hours',description:'48 שעות אחרי שליחת הצעת מחיר'},
+    {id:'fu2',label:'פולו-אפ מסמכים וביטוחים',trigger:'signed',hours:48,unit:'hours',description:'48 שעות אחרי הסכם חתום'},
+    {id:'fu3',label:'פולו-אפ תיאום לפני הגעה',trigger:'arrival',hours:96,unit:'hours',description:'96 שעות לפני תאריך ההגעה'},
+    {id:'fu4',label:'פולו-אפ הנחיות למחלקות',trigger:'arrival',hours:168,unit:'hours',description:'168 שעות (7 ימים) לפני תאריך ההגעה'}
+  ]
+};
+
+let groups = [], settings = JSON.parse(JSON.stringify(DEF_SETTINGS));
+let editingId = null, currentPage = 1;
+const PER = 15;
+let charts = {};
+
+const STATUS_COLORS = {quote:'#6366f1',precontract:'#f59e0b',signed:'#22c55e',closed:'#0d9488',lost:'#9ca3af',cancelled:'#ef4444'};
+const SOURCE_COLORS = {miri:'#a855f7',direct:'#0d9488',agent:'#2563eb'};
+const STATUS_BADGE  = {quote:'quote',precontract:'precontract',signed:'signed',closed:'closed',lost:'lost',cancelled:'cancelled'};
+const SOURCE_BADGE  = {miri:'src-miri',direct:'src-direct',agent:'src-agent'};
+
+// ══════════════════════ MICROSOFT GRAPH CONFIG ══════════════════════
+const SP_CONFIG = {
+  clientId: '156bbdad-5a20-46c6-892e-f3a438ea4610',
+  tenantId: '814a00bd-0505-4afc-97e5-e433a502deb9',
+  siteUrl:  'https://eingev.sharepoint.com',
+  listName: 'מרכז הזמנות - קבוצות ישראלים',
+};
+const GRAPH_SCOPES = ['Sites.ReadWrite.All','User.Read'];
+const MSAL_CONFIG = {
+  auth: {
+    clientId: SP_CONFIG.clientId,
+    authority: `https://login.microsoftonline.com/${SP_CONFIG.tenantId}`,
+    redirectUri: window.location.origin || 'http://localhost',
+  },
+  cache: { cacheLocation:'localStorage', storeAuthStateInCookie:true }
+};
+let msalInstance=null, spMode=false, graphSiteId=null, graphListId=null;
+
+const STATUS_MAP_REV={'נשלחה הצעת מחיר':'quote','טרום הסכם':'precontract','הסכם חתום':'signed','קבוצה סגורה':'closed','לא נסגרה':'lost','בוטל לאחר הסכם':'cancelled'};
+const SOURCE_MAP_REV={'מירי יוסף':'miri','ישיר':'direct','סוכן / מפיק':'agent'};
+
+function spItemToGroup(item) {
+  const f=item.fields||item;
+  const pd=v=>v?(typeof v==='string'&&v.includes('T')?v.split('T')[0]:String(v)):'';
+  const g={
+    id:item.id||Date.now(), _spId:item.id,
+    name:f['Title']||'',
+    contact:f['\u05d0\u05d9\u05e9 \u05e7\u05e9\u05e8']||'',
+    phone:f['\u05d8\u05dc\u05e4\u05d5\u05df']||'',
+    email:f['\u05d0\u05d9\u05de\u05d9\u05d9\u05dc']||'',
+    source:SOURCE_MAP_REV[f['\u05de\u05e7\u05d5\u05e8 \u05d4\u05d2\u05e2\u05d4']||'']||'direct',
+    agent:f['\u05e9\u05dd \u05e1\u05d5\u05db\u05df  \u05de\u05e4\u05d9\u05e7']||f['\u05e9\u05dd \u05e1\u05d5\u05db\u05df / \u05de\u05e4\u05d9\u05e7']||'',
+    webContact:(f['\u05d4\u05d2\u05d9\u05e2 \u05d3\u05e8\u05da \u05d0\u05ea\u05e8']||'')==='\u05db\u05df',
+    reqDate:pd(f['\u05ea\u05d0\u05e8\u05d9\u05da \u05d1\u05e7\u05e9\u05d4']),
+    stayDate:pd(f['\u05ea\u05d0\u05e8\u05d9\u05da \u05e9\u05d4\u05d9\u05d9\u05d4']),
+    statusDate:pd(f['\u05ea\u05d0\u05e8\u05d9\u05da \u05e9\u05d9\u05e0\u05d5\u05d9 \u05e1\u05d8\u05d0\u05d8\u05d5\u05e1']),
+    nights:parseInt(f['\u05de\u05e1\u05e4\u05e8 \u05dc\u05d9\u05dc\u05d5\u05ea'])||0,
+    rooms:parseInt(f['\u05de\u05e1\u05e4\u05e8 \u05d7\u05d3\u05e8\u05d9\u05dd'])||0,
+    guests:parseInt(f['\u05de\u05e1\u05e4\u05e8 \u05d0\u05d5\u05e8\u05d7\u05d9\u05dd'])||0,
+    roomTypes:(f['\u05e1\u05d5\u05d2\u05d9 \u05d7\u05d3\u05e8\u05d9\u05dd']||'').split(',').map(s=>s.trim()).filter(Boolean),
+    priceLodging:parseFloat(f['\u05e6\u05e4\u05d9 \u05d4\u05db\u05e0\u05e1\u05d4 \u05dc\u05d9\u05e0\u05d4']||0)||0,
+    priceExtras:parseFloat(f['\u05e6\u05e4\u05d9 \u05d4\u05db\u05e0\u05e1\u05d4 \u05ea\u05d5\u05e1\u05e4\u05d5\u05ea']||0)||0,
+    status:STATUS_MAP_REV[f['\u05e1\u05d8\u05d0\u05d8\u05d5\u05e1']||'']||'quote',
+    lostReason:f['\u05e1\u05d9\u05d1\u05ea \u05d0\u05d9-\u05e1\u05d2\u05d9\u05e8\u05d4']||f['\u05e1\u05d9\u05d1\u05ea \u05d0\u05d9 \u05e1\u05d2\u05d9\u05e8\u05d4']||'',
+    deptInstructionsSent:(f['\u05d4\u05e0\u05d7\u05d9\u05d5\u05ea \u05e0\u05e9\u05dc\u05d7\u05d5']||'')==='\u2705 \u05e0\u05e9\u05dc\u05d7\u05d5',
+    notes:f['\u05d4\u05e2\u05e8\u05d5\u05ea']||'',
+    timeline:[],
+  };
+  return g;
+}
+
+function groupToGraphFields(g) {
+  const SL=settings.statusLabels||DEF_SETTINGS.statusLabels;
+  const SRC=settings.sourceLabels||DEF_SETTINGS.sourceLabels;
+  const fields={
+    'Title':g.name||'',
+    '\u05d0\u05d9\u05e9 \u05e7\u05e9\u05e8':g.contact||'',
+    '\u05d8\u05dc\u05e4\u05d5\u05df':g.phone||'',
+    '\u05d0\u05d9\u05de\u05d9\u05d9\u05dc':g.email||'',
+    '\u05de\u05e7\u05d5\u05e8 \u05d4\u05d2\u05e2\u05d4':SRC[g.source]||g.source||'',
+    '\u05e9\u05dd \u05e1\u05d5\u05db\u05df  \u05de\u05e4\u05d9\u05e7':g.agent||'',
+    '\u05d4\u05d2\u05d9\u05e2 \u05d3\u05e8\u05da \u05d0\u05ea\u05e8':g.webContact?'\u05db\u05df':'\u05dc\u05d0',
+    '\u05de\u05e1\u05e4\u05e8 \u05dc\u05d9\u05dc\u05d5\u05ea':g.nights||0,
+    '\u05de\u05e1\u05e4\u05e8 \u05d7\u05d3\u05e8\u05d9\u05dd':g.rooms||0,
+    '\u05de\u05e1\u05e4\u05e8 \u05d0\u05d5\u05e8\u05d7\u05d9\u05dd':g.guests||0,
+    '\u05e1\u05d5\u05d2\u05d9 \u05d7\u05d3\u05e8\u05d9\u05dd':(g.roomTypes||[]).join(', '),
+    '\u05e6\u05e4\u05d9 \u05d4\u05db\u05e0\u05e1\u05d4 \u05dc\u05d9\u05e0\u05d4':g.priceLodging||0,
+    '\u05e6\u05e4\u05d9 \u05d4\u05db\u05e0\u05e1\u05d4 \u05ea\u05d5\u05e1\u05e4\u05d5\u05ea':g.priceExtras||0,
+    '\u05e1\u05d8\u05d0\u05d8\u05d5\u05e1':SL[g.status]||g.status||'',
+    '\u05e1\u05d9\u05d1\u05ea \u05d0\u05d9-\u05e1\u05d2\u05d9\u05e8\u05d4':g.lostReason||'',
+    '\u05d4\u05e0\u05d7\u05d9\u05d5\u05ea \u05e0\u05e9\u05dc\u05d7\u05d5':g.deptInstructionsSent?'\u2705 \u05e0\u05e9\u05dc\u05d7\u05d5':'\u25a1 \u05d8\u05e8\u05dd \u05e0\u05e9\u05dc\u05d7\u05d5',
+    '\u05d4\u05e2\u05e8\u05d5\u05ea':g.notes||'',
+  };
+  if(g.reqDate)    fields['\u05ea\u05d0\u05e8\u05d9\u05da \u05d1\u05e7\u05e9\u05d4']=g.reqDate+'T00:00:00Z';
+  if(g.stayDate)   fields['\u05ea\u05d0\u05e8\u05d9\u05da \u05e9\u05d4\u05d9\u05d9\u05d4']=g.stayDate+'T00:00:00Z';
+  if(g.statusDate) fields['\u05ea\u05d0\u05e8\u05d9\u05da \u05e9\u05d9\u05e0\u05d5\u05d9 \u05e1\u05d8\u05d0\u05d8\u05d5\u05e1']=g.statusDate+'T00:00:00Z';
+  return fields;
+}
+
+async function initMsal() {
+  return new Promise(resolve => {
+    if (window.msal) {
+      try { msalInstance = new msal.PublicClientApplication(MSAL_CONFIG); } catch(e){}
+      resolve(true); return;
+    }
+    const s = document.createElement('script');
+    // Load MSAL from our own GitHub repo — no external CDN needed
+    s.src = 'https://noambenjamin.github.io/eingev-dashboard/msal.min.js';
+    s.onload = () => {
+      try { msalInstance = new msal.PublicClientApplication(MSAL_CONFIG); } catch(e){}
+      resolve(true);
+    };
+    s.onerror = () => resolve(false);
+    document.head.appendChild(s);
+  });
+}
+
+async function getGraphToken() {
+  // Check for stored valid token
+  const stored = localStorage.getItem('eg3_token');
+  if (stored) {
+    try {
+      const t = JSON.parse(stored);
+      if (t.expires > Date.now() + 60000) return t.access_token;
+    } catch(e) {}
+  }
+
+  if (!msalInstance) return null;
+  try { await msalInstance.initialize(); } catch(e) {}
+
+  const accounts = msalInstance.getAllAccounts();
+  try {
+    if (accounts.length) {
+      const r = await msalInstance.acquireTokenSilent({ scopes: GRAPH_SCOPES, account: accounts[0] });
+      cacheToken(r.accessToken, 3600);
+      return r.accessToken;
+    }
+  } catch(e) {}
+
+  try {
+    const r = await msalInstance.acquireTokenPopup({ scopes: GRAPH_SCOPES });
+    cacheToken(r.accessToken, 3600);
+    return r.accessToken;
+  } catch(e) {
+    console.error('Token error', e);
+    return null;
+  }
+}
+
+function cacheToken(token, expiresIn) {
+  try {
+    localStorage.setItem('eg3_token', JSON.stringify({
+      access_token: token,
+      expires: Date.now() + expiresIn * 1000
+    }));
+  } catch(e) {}
+}
+
+async function graphCall(method,path,body){
+  const token=await getGraphToken();if(!token)return null;
+  try{
+    const r=await fetch(`https://graph.microsoft.com/v1.0/${path}`,{
+      method,headers:{'Authorization':`Bearer ${token}`,'Content-Type':'application/json','Accept':'application/json'},
+      body:body?JSON.stringify(body):undefined
+    });
+    if(!r.ok){console.error('Graph error',r.status,path);return null;}
+    return r.status===204?{}:await r.json();
+  }catch(e){console.error(e);return null;}
+}
+
+async function getSiteAndList(){
+  if(graphSiteId&&graphListId)return true;
+  const site=await graphCall('GET','sites/eingev.sharepoint.com:/');
+  if(!site?.id)return false;
+  graphSiteId=site.id;
+  const lists=await graphCall('GET',`sites/${graphSiteId}/lists`);
+  if(!lists?.value)return false;
+  const list=lists.value.find(l=>l.displayName===SP_CONFIG.listName||l.name===SP_CONFIG.listName);
+  if(!list){console.error('List not found:',lists.value.map(l=>l.displayName));return false;}
+  graphListId=list.id;
+  return true;
+}
+
+async function loadFromSharePoint(){
+  const ok=await getSiteAndList();if(!ok)return false;
+  const data=await graphCall('GET',`sites/${graphSiteId}/lists/${graphListId}/items?expand=fields&$top=500`);
+  if(!data?.value)return false;
+  groups=data.value.map(spItemToGroup).filter(g=>g.name);
+  return true;
+}
+
+async function saveGroupToSharePoint(g){
+  const ok=await getSiteAndList();if(!ok)return false;
+  const body={fields:groupToGraphFields(g)};
+  if(g._spId){
+    const r=await graphCall('PATCH',`sites/${graphSiteId}/lists/${graphListId}/items/${g._spId}`,body);
+    return r!==null;
+  }else{
+    const r=await graphCall('POST',`sites/${graphSiteId}/lists/${graphListId}/items`,body);
+    if(r?.id){g._spId=r.id;g.id=r.id;}
+    return r!==null;
+  }
+}
+
+async function deleteGroupFromSharePoint(spId){
+  if(!spId||!graphSiteId||!graphListId)return;
+  await graphCall('DELETE',`sites/${graphSiteId}/lists/${graphListId}/items/${spId}`);
+}
+
+// ══════════════════════ STORAGE (with SharePoint fallback) ══════════════════════
+function fmtDate(iso) {
+  if(!iso) return '—';
+  const parts = iso.split('-');
+  if(parts.length !== 3) return iso;
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
+
+async function load() {
+  showLoading(true);
+
+  // Try SharePoint first
+  const msalOk = await initMsal();
+  if (msalOk) {
+    try {
+      const token = await getGraphToken();
+      if (token) {
+        const spOk = await loadFromSharePoint();
+        if (spOk) {
+          spMode = true;
+          showConnectionStatus(true);
+          showLoading(false);
+          // Load settings from localStorage
+          try { const r=localStorage.getItem('eg3_set'); if(r) settings={...DEF_SETTINGS,...JSON.parse(r)}; } catch(e){}
+          init();
+          return;
+        }
+      }
+    } catch(e) { console.error('SP load error', e); }
+  }
+
+  // Fallback: localStorage
+  showConnectionStatus(false);
+  try { const r=localStorage.getItem('eg3_data'); if(r){const d=JSON.parse(r);groups=d.groups||[];} } catch(e){}
+  try { const r=localStorage.getItem('eg3_set');  if(r) settings={...DEF_SETTINGS,...JSON.parse(r)}; } catch(e){}
+  if (!groups.length) groups = sample();
+  showLoading(false);
+  init();
+}
+
+async function saveData() {
+  // Always save settings to localStorage
+  try { localStorage.setItem('eg3_set', JSON.stringify(settings)); } catch(e){}
+  // Groups: save to SharePoint if connected, else localStorage
+  if (!spMode) {
+    try { localStorage.setItem('eg3_data', JSON.stringify({groups})); } catch(e){}
+  }
+  // Note: individual group saves to SP happen in saveGroup()
+}
+
+function showLoading(show) {
+  const el = document.getElementById('loading-overlay');
+  if (el) el.style.display = show ? 'flex' : 'none';
+}
+
+function showConnectionStatus(connected) {
+  const el = document.getElementById('sp-status');
+  if (!el) return;
+  el.innerHTML = connected
+    ? `<span style="color:var(--green);font-size:12px;font-weight:600">🟢 מחובר ל-SharePoint</span>`
+    : `<span style="color:var(--yellow);font-size:12px;font-weight:600">🟡 מצב מקומי בלבד</span>`;
+}
+
+// ══════════════════════ SAMPLE DATA ══════════════════════
+function sample() {
+  const t=new Date(), d=o=>{const x=new Date(t);x.setDate(x.getDate()+o);return x.toISOString().split('T')[0];};
+  return [
+    {id:1,name:'חברת המשביר בע"מ',contact:'דני לוי',phone:'054-1234567',email:'dani@mashbir.co.il',source:'agent',agent:'סוכנות כרמל',reqDate:d(-5),stayDate:d(30),nights:2,rooms:12,guests:60,roomTypes:['וילה','חדר ים'],priceLodging:40000,priceExtras:8000,status:'signed',lostReason:'',statusDate:d(-5),webContact:false,notes:'קבוצת חג',timeline:[{action:'פניה',time:d(-10)},{action:'נשלחה הצעת מחיר',time:d(-8)},{action:'טרום הסכם',time:d(-6)},{action:'הסכם חתום',time:d(-5)}]},
+    {id:2,name:'בנק הפועלים – חיפה',contact:'מיכל אבן',phone:'052-9876543',email:'michal@poalim.co.il',source:'miri',agent:'',reqDate:d(-3),stayDate:d(45),nights:3,rooms:20,guests:80,roomTypes:['חדר מלון'],priceLodging:65000,priceExtras:12000,status:'precontract',lostReason:'',statusDate:d(-3),webContact:false,notes:'כנס שנתי',timeline:[{action:'פניה',time:d(-8)},{action:'נשלחה הצעת מחיר',time:d(-5)},{action:'טרום הסכם',time:d(-3)}]},
+    {id:3,name:'קיבוץ גשר',contact:'אמיר שכטר',phone:'04-6789000',email:'amir@gesher.org',source:'direct',agent:'',reqDate:d(-2),stayDate:d(20),nights:1,rooms:8,guests:35,roomTypes:['דירה'],priceLodging:15000,priceExtras:3000,status:'quote',lostReason:'',statusDate:d(-2),webContact:true,notes:'כנס חברים',timeline:[{action:'פניה דרך אתר',time:d(-2)},{action:'נשלחה הצעת מחיר',time:d(-2)}]},
+    {id:4,name:'פרטנר תקשורת',contact:'ליאת קוהן',phone:'03-5555555',email:'liat@partner.co.il',source:'agent',agent:'ת"א טורס',reqDate:d(-20),stayDate:d(-5),nights:2,rooms:15,guests:50,roomTypes:['חדר נוף'],priceLodging:38000,priceExtras:5000,status:'lost',lostReason:'price',statusDate:d(-15),webContact:false,notes:'',timeline:[{action:'פניה',time:d(-20)},{action:'נשלחה הצעת מחיר',time:d(-18)},{action:'לא נסגרה',time:d(-15)}]},
+    {id:5,name:'משרד החינוך',contact:'יוסף מנחם',phone:'073-1234500',email:'yosef@edu.gov.il',source:'miri',agent:'',reqDate:d(-1),stayDate:d(35),nights:2,rooms:25,guests:100,roomTypes:['חדר מלון','חדר ים'],priceLodging:90000,priceExtras:15000,status:'quote',lostReason:'',statusDate:d(-1),webContact:false,notes:'קייטנת קיץ',timeline:[{action:'פניה',time:d(-1)},{action:'נשלחה הצעת מחיר',time:d(-1)}]},
+    {id:6,name:'גמלאי צמח גיל',contact:'רות שמיר',phone:'050-7654321',email:'ruth@gmail.com',source:'direct',agent:'',reqDate:d(0),stayDate:d(60),nights:3,rooms:9,guests:28,roomTypes:['דירה'],priceLodging:22000,priceExtras:4000,status:'quote',lostReason:'',statusDate:d(0),webContact:false,notes:'',timeline:[{action:'פניה',time:d(0)},{action:'נשלחה הצעת מחיר',time:d(0)}]},
+    {id:7,name:'אל-על תעשיות',contact:'חיים גלעד',phone:'08-9000111',email:'haim@elal.co.il',source:'agent',agent:'VIP טורס',reqDate:d(-30),stayDate:d(-10),nights:2,rooms:14,guests:45,roomTypes:['וילה'],priceLodging:48000,priceExtras:9000,status:'cancelled',lostReason:'',statusDate:d(-12),webContact:false,notes:'בוטל שבועיים לפני',timeline:[{action:'פניה',time:d(-40)},{action:'הסכם חתום',time:d(-35)},{action:'בוטל לאחר הסכם',time:d(-12)}]},
+    {id:8,name:'ויצו ירושלים',contact:'נורית ברק',phone:'02-6666777',email:'nurit@wizo.org',source:'web',agent:'',reqDate:d(-4),stayDate:d(18),nights:1,rooms:16,guests:55,roomTypes:['חדר מלון'],priceLodging:30000,priceExtras:6000,status:'precontract',lostReason:'',statusDate:d(-2),webContact:true,notes:'',timeline:[{action:'טופס אתר',time:d(-4)},{action:'נשלחה הצעת מחיר',time:d(-3)},{action:'טרום הסכם',time:d(-2)}]},
+    {id:9,name:'מועצה פרדס-חנה',contact:'שלמה אורן',phone:'04-6370000',email:'shlomo@pardes.gov.il',source:'direct',agent:'',reqDate:d(-25),stayDate:d(-8),nights:2,rooms:18,guests:70,roomTypes:['חדר מלון'],priceLodging:55000,priceExtras:8000,status:'lost',lostReason:'avail',statusDate:d(-22),webContact:false,notes:'לא הייתה זמינות',timeline:[{action:'פניה',time:d(-25)},{action:'נשלחה הצעת מחיר',time:d(-24)},{action:'לא נסגרה',time:d(-22)}]},
+    {id:10,name:'מגן דוד אדום',contact:'טל פרץ',phone:'03-5300111',email:'tal@mda.org.il',source:'miri',agent:'',reqDate:d(0),stayDate:d(90),nights:3,rooms:22,guests:90,roomTypes:['וילה','דירה'],priceLodging:95000,priceExtras:18000,status:'quote',lostReason:'',statusDate:d(0),webContact:false,notes:'',timeline:[{action:'פניה',time:d(0)},{action:'נשלחה הצעת מחיר',time:d(0)}]},
+    {id:11,name:'אוניברסיטת חיפה',contact:'ד"ר גל מור',phone:'04-8240000',email:'gal@haifa.ac.il',source:'agent',agent:'כרמל טורס',reqDate:d(-18),stayDate:d(25),nights:2,rooms:17,guests:65,roomTypes:['חדר נוף'],priceLodging:58000,priceExtras:10000,status:'lost',lostReason:'capacity',statusDate:d(-12),webContact:false,notes:'',timeline:[{action:'פניה',time:d(-18)},{action:'נשלחה הצעת מחיר',time:d(-16)},{action:'לא נסגרה – כמות חורגת',time:d(-12)}]},
+    {id:12,name:'עמותת ידידים',contact:'שרה כץ',phone:'052-1112233',email:'sara@yadidim.org',source:'web',agent:'',reqDate:d(-6),stayDate:d(40),nights:1,rooms:11,guests:40,roomTypes:['דירה','חדר ים'],priceLodging:20000,priceExtras:4500,status:'signed',lostReason:'',statusDate:d(-4),webContact:true,notes:'גיבוש',timeline:[{action:'טופס אתר',time:d(-6)},{action:'נשלחה הצעת מחיר',time:d(-5)},{action:'טרום הסכם',time:d(-5)},{action:'הסכם חתום',time:d(-4)}]},
+  ];
+}
+
+// ══════════════════════ BADGES ══════════════════════
+function sBadge(s) { return `<span class="badge ${STATUS_BADGE[s]||'lost'}"><span class="badge-dot"></span>${settings.statusLabels?.[s]||s}</span>`; }
+function srcBadge(s) { return `<span class="src-badge ${SOURCE_BADGE[s]||'src-direct'}">${settings.sourceLabels?.[s]||s}</span>`; }
+function lrLabel(id) { return settings.lostReasons.find(r=>r.id===id)?.label||id||'—'; }
+
+// ══════════════════════ FOLLOW-UP ══════════════════════
+function getFuStatus(g) {
+  const now = Date.now();
+  const statusMs = g.statusDate ? new Date(g.statusDate).getTime() : null;
+  const stayMs   = g.stayDate   ? new Date(g.stayDate).getTime()   : null;
+  const elapsedH = statusMs ? (now - statusMs) / 3600000 : null;
+  const hoursToArrival = stayMs ? (stayMs - now) / 3600000 : null;
+
+  // Terminal states – no fu needed
+  if (['cancelled','lost','closed'].includes(g.status)) return {cls:'fu-ok',label:'✓'};
+
+  const rule1 = settings.fuRules?.find(r=>r.id==='fu1') || {hours:48};
+  const rule2 = settings.fuRules?.find(r=>r.id==='fu2') || {hours:48};
+  const rule3 = settings.fuRules?.find(r=>r.id==='fu3') || {hours:96};
+  const rule4 = settings.fuRules?.find(r=>r.id==='fu4') || {hours:168};
+
+  // Dept instructions check – 168h (7 days) before arrival, regardless of status
+  if (!g.deptInstructionsSent && hoursToArrival !== null && hoursToArrival >= 0 && hoursToArrival <= rule4.hours) {
+    return {cls:'fu-overdue', label:'⚠ הנחיות מחלקות'};
+  }
+
+  if (g.status === 'signed') {
+    // fu2: memos/insurance 48h after signing
+    if (elapsedH !== null) {
+      if (elapsedH >= rule2.hours) return {cls:'fu-overdue', label:'⚠ פולו-אפ מסמכים'};
+      if (elapsedH >= rule2.hours * 0.6) return {cls:'fu-warn', label:'⏳ מסמכים בקרוב'};
+    }
+    // fu3: coordination 96h before arrival
+    if (hoursToArrival !== null && hoursToArrival >= 0 && hoursToArrival <= rule3.hours) {
+      return {cls:'fu-overdue', label:'⚠ תיאום הגעה'};
+    }
+    return {cls:'fu-ok', label:'✓'};
+  }
+
+  if (g.status === 'precontract') {
+    if (elapsedH !== null) {
+      if (elapsedH >= rule1.hours) return {cls:'fu-overdue', label:'⚠ פולו-אפ הסכם'};
+      if (elapsedH >= rule1.hours * 0.6) return {cls:'fu-warn', label:'⏳ הסכם בקרוב'};
+    }
+    return {cls:'fu-ok', label:'✓'};
+  }
+
+  if (g.status === 'quote') {
+    if (elapsedH !== null) {
+      if (elapsedH >= rule1.hours) return {cls:'fu-overdue', label:'⚠ פולו-אפ הצעה'};
+      if (elapsedH >= rule1.hours * 0.6) return {cls:'fu-warn', label:'⏳ הצעה ממתינה'};
+    }
+    return {cls:'fu-ok', label:'✓'};
+  }
+
+  return {cls:'fu-ok', label:'✓'};
+}
+
+function overdueGroups() { return groups.filter(g=>getFuStatus(g).cls==='fu-overdue'); }
+
+// ══════════════════════ DATE HELPERS ══════════════════════
+function fmt(d) {
+  // Format in LOCAL time to avoid UTC-shift issues
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function monthBounds() {
+  const n=new Date();
+  const y=n.getFullYear(), m=n.getMonth();
+  // Last day of month: day 0 of NEXT month
+  const lastDay=new Date(y, m+1, 0).getDate();
+  const mm=String(m+1).padStart(2,'0');
+  const ld=String(lastDay).padStart(2,'0');
+  return { from:`${y}-${mm}-01`, to:`${y}-${mm}-${ld}` };
+}
+function quarterBounds() {
+  const n=new Date(), y=n.getFullYear();
+  // Fixed quarter boundaries
+  const q=Math.floor(n.getMonth()/3); // 0,1,2,3
+  const qStarts=[[1,1],[4,1],[7,1],[10,1]];
+  const qEnds  =[[3,31],[6,30],[9,30],[12,31]];
+  const [sm,sd]=qStarts[q]; const [em,ed]=qEnds[q];
+  return {
+    from:`${y}-${String(sm).padStart(2,'0')}-${String(sd).padStart(2,'0')}`,
+    to:  `${y}-${String(em).padStart(2,'0')}-${String(ed).padStart(2,'0')}`
+  };
+}
+function yearBounds() { const y=new Date().getFullYear(); return {from:`${y}-01-01`,to:`${y}-12-31`}; }
+
+// ══════════════════════ DASHBOARD DATE ══════════════════════
+let dbPreset = 'month';
+function dbSetPreset(p) {
+  dbPreset=p;
+  document.querySelectorAll('#db-presets .preset-btn').forEach((b,i)=>b.classList.toggle('active',['month','quarter','year','all'][i]===p));
+  const b=p==='month'?monthBounds():p==='quarter'?quarterBounds():p==='year'?yearBounds():{from:'',to:''};
+  document.getElementById('db-date-from').value=b.from;
+  document.getElementById('db-date-to').value=b.to;
+  renderDashboard();
+}
+function dbOnDateChange() {
+  dbPreset='custom';
+  document.querySelectorAll('#db-presets .preset-btn').forEach(b=>b.classList.remove('active'));
+  renderDashboard();
+}
+function getDbFiltered() {
+  const from=document.getElementById('db-date-from')?.value||'';
+  const to=document.getElementById('db-date-to')?.value||'';
+  return groups.filter(g=>{
+    if(from&&g.reqDate&&g.reqDate<from)return false;
+    if(to&&g.reqDate&&g.reqDate>to)return false;
+    return true;
+  });
+}
+
+// ══════════════════════ TABLE DATE ══════════════════════
+let tblPreset = 'month';
+function tblSetPreset(p) {
+  tblPreset=p;
+  document.querySelectorAll('#tbl-presets .preset-btn').forEach((b,i)=>b.classList.toggle('active',['month','quarter','year','all'][i]===p));
+  const b=p==='month'?monthBounds():p==='quarter'?quarterBounds():p==='year'?yearBounds():{from:'',to:''};
+  document.getElementById('tbl-from').value=b.from;
+  document.getElementById('tbl-to').value=b.to;
+  currentPage=1; renderTable();
+}
+function tblDateChange() {
+  tblPreset='custom';
+  document.querySelectorAll('#tbl-presets .preset-btn').forEach(b=>b.classList.remove('active'));
+  currentPage=1; renderTable();
+}
+
+// ══════════════════════ TABS ══════════════════════
+function switchTab(n) {
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['dashboard','groups','settings'][i]===n));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-'+n).classList.add('active');
+  if(n==='dashboard'){renderDashboard();}
+  if(n==='groups'){rebuildLrFilter();renderTable();}
+  if(n==='settings'){renderSettings();}
+}
+
+// ══════════════════════ DASHBOARD ══════════════════════
+function renderDashboard() {
+  const data = getDbFiltered();
+  document.getElementById('db-count').textContent = `${data.length} קבוצות`;
+
+  // alerts
+  const ov = overdueGroups();
+  const al = document.getElementById('db-alerts');
+  if (ov.length) {
+    al.style.display='flex';
+    document.getElementById('db-alerts-text').innerHTML=`<strong>${ov.length} קבוצות דורשות פולו-אפ דחוף:</strong> `+ov.map(g=>`<span style="color:var(--red);font-weight:600">${g.name}</span>`).join(', ');
+  } else al.style.display='none';
+
+  const total      = data.length;
+  const quote      = data.filter(g=>g.status==='quote').length;
+  const precon     = data.filter(g=>g.status==='precontract').length;
+  const closedAll  = data.filter(g=>['signed','closed'].includes(g.status)).length;
+  const lost       = data.filter(g=>g.status==='lost').length;
+  const canc       = data.filter(g=>g.status==='cancelled').length;
+  // Room Nights = rooms × nights for all signed/closed groups
+  const roomNights = data
+    .filter(g=>['signed','closed'].includes(g.status))
+    .reduce((a,g)=>a+((g.rooms||0)*(g.nights||0)),0);
+  const revLod  = data.reduce((a,b)=>a+(b.priceLodging||0),0);
+  const revExt  = data.reduce((a,b)=>a+(b.priceExtras||0),0);
+  const revTotal= revLod + revExt;
+
+  document.getElementById('kpi-grid').innerHTML=[
+    {l:'סה"כ פניות',     v:total,                              s:'בתקופה הנבחרת',          i:'📋',c:'blue'},
+    {l:'נשלחה הצעת מחיר',v:quote,                              s:'ממתין לתשובה',            i:'📄',c:'indigo'},
+    {l:'טרום הסכם',      v:precon,                             s:'בתהליך חתימה',            i:'🔄',c:'yellow'},
+    {l:'קבוצות סגורות',  v:closedAll,                          s:'הסכם חתום + קבוצה סגורה',i:'✅',c:'green'},
+    {l:'Room Nights',    v:roomNights.toLocaleString('he-IL'), s:'לינות – קבוצות סגורות',  i:'🛏️',c:'teal'},
+    {l:'לא נסגרה',       v:lost,                               s:'הפסדי מכירה',             i:'❌',c:'red'},
+    {l:'בוטל לאחר הסכם', v:canc,                               s:'ביטולים',                 i:'🚫',c:'orange'},
+    {l:'פולו-אפ דחוף',   v:ov.length,                          s:'דורש טיפול',              i:'⚠️',c:'purple'},
+    {l:'צפי הכנסות',     v:'₪'+revTotal.toLocaleString('he-IL'),s:`לינה ₪${revLod.toLocaleString('he-IL')}\nתוספות ₪${revExt.toLocaleString('he-IL')}`,i:'💰',c:'teal'},
+  ].map(k=>`<div class="kpi ${k.c}"><div class="kpi-icon">${k.i}</div><div class="kpi-label">${k.l}</div><div class="kpi-val">${k.v}</div><div class="kpi-sub" style="white-space:pre-line">${k.s}</div></div>`).join('');
+
+  // Source pills – web is counted under its chosen source
+  const bySrc={};
+  data.forEach(g=>{
+    const src = g.source==='web' ? (g._parentSource||'direct') : g.source;
+    bySrc[src]=(bySrc[src]||0)+1;
+  });
+  document.getElementById('source-summary').innerHTML=Object.entries(bySrc).map(([s,c])=>`
+    <div class="source-pill"><span class="source-pill-dot" style="background:${SOURCE_COLORS[s]||'#888'}"></span><span style="color:var(--text2)">${settings.sourceLabels?.[s]||s}</span><span class="source-pill-count" style="color:${SOURCE_COLORS[s]||'#888'}">${c}</span><span style="font-size:11px;color:var(--text3)">קבוצות</span></div>`).join('');
+
+  buildCharts(data);
+  document.getElementById('badge-fu').textContent = ov.length;
+}
+
+function buildCharts(data) {
+  Object.values(charts).forEach(c=>{try{c.destroy();}catch(e){}});charts={};
+
+  // 1. Status pie
+  const closedAllN  = data.filter(g=>['signed','closed'].includes(g.status)).length;
+  const inProgress  = data.filter(g=>['quote','precontract'].includes(g.status)).length;
+  const lostN       = data.filter(g=>g.status==='lost').length;
+  const cancN       = data.filter(g=>g.status==='cancelled').length;
+  document.getElementById('donut-status-val').textContent = data.length;
+  const sLbls=['קבוצות סגורות','קבוצה בתהליך','לא נסגרה','בוטל לאחר הסכם'];
+  const sData=[closedAllN,inProgress,lostN,cancN];
+  const sCols=['#22c55e','#6366f1','#9ca3af','#ef4444'];
+  document.getElementById('legend-status').innerHTML=sLbls.map((l,i)=>`<span class="legend-item"><span class="legend-dot" style="background:${sCols[i]}"></span>${l} <strong>${sData[i]}</strong></span>`).join('');
+  charts.st=new Chart(document.getElementById('chart-status'),{
+    type:'doughnut',
+    data:{labels:sLbls,datasets:[{data:sData,backgroundColor:sCols,borderColor:'#fff',borderWidth:3,hoverOffset:5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'68%'}
+  });
+
+  // 2. Sources donut – web is merged into whatever source was chosen
+  const sc={miri:0,direct:0,agent:0};
+  data.forEach(g=>{
+    const src = g.source==='web' ? (g._parentSource||'direct') : g.source;
+    if(sc[src]!==undefined) sc[src]++;
+    else sc[src]=1;
+  });
+  document.getElementById('donut-src-val').textContent=data.length;
+  const srcLbls=Object.keys(sc).map(k=>settings.sourceLabels?.[k]||k);
+  const srcData=Object.values(sc);
+  const srcCols=Object.keys(sc).map(k=>SOURCE_COLORS[k]||'#888');
+  document.getElementById('legend-src').innerHTML=srcLbls.map((l,i)=>`<span class="legend-item"><span class="legend-dot" style="background:${srcCols[i]}"></span>${l} <strong>${srcData[i]}</strong></span>`).join('');
+  charts.src=new Chart(document.getElementById('chart-sources'),{
+    type:'doughnut',
+    data:{labels:srcLbls,datasets:[{data:srcData,backgroundColor:srcCols,borderColor:'#fff',borderWidth:3,hoverOffset:5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'68%'}
+  });
+
+  // 3. Lost reasons – horizontal bar
+  const lg=data.filter(g=>g.status==='lost');
+  document.getElementById('lost-sub').textContent=`${lg.length} קבוצות שלא נסגרו`;
+  const lrC={};settings.lostReasons.forEach(r=>{lrC[r.id]=0;});
+  lg.forEach(g=>{if(g.lostReason)lrC[g.lostReason]=(lrC[g.lostReason]||0)+1;});
+  const lrLbls=settings.lostReasons.map(r=>r.label);
+  const lrData=settings.lostReasons.map(r=>lrC[r.id]||0);
+  charts.lr=new Chart(document.getElementById('chart-lost'),{
+    type:'bar',
+    data:{labels:lrLbls,datasets:[{data:lrData,backgroundColor:'#fee2e2',borderColor:'#dc2626',borderWidth:1.5,borderRadius:5}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:'#9ba3b8',font:{size:10,family:'Heebo'},stepSize:1},grid:{color:'rgba(0,0,0,.05)'},border:{dash:[4,4]}},
+        y:{ticks:{color:'#5a6075',font:{size:11,family:'Heebo'}},grid:{display:false}}
+      }
+    }
+  });
+}
+
+// ══════════════════════ TABLE FILTER ══════════════════════
+function getFiltered() {
+  const q  =(document.getElementById('search-input')?.value||'').toLowerCase();
+  const st = document.getElementById('filter-status')?.value||'';
+  const src= document.getElementById('filter-source')?.value||'';
+  const lr = document.getElementById('filter-lr')?.value||'';
+  const fu = document.getElementById('filter-fu')?.value||'';
+  const tf = document.getElementById('tbl-from')?.value||'';
+  const tt = document.getElementById('tbl-to')?.value||'';
+  const sf = document.getElementById('stay-from')?.value||'';
+  const st2= document.getElementById('stay-to')?.value||'';
+  return groups.filter(g=>{
+    if(q&&!`${g.name} ${g.agent||''} ${g.contact||''}`.toLowerCase().includes(q))return false;
+    if(st&&g.status!==st)return false;
+    if(src&&g.source!==src)return false;
+    if(lr&&g.lostReason!==lr)return false;
+    if(fu){const f=getFuStatus(g);if(fu==='overdue'&&f.cls!=='fu-overdue')return false;if(fu==='warn'&&f.cls!=='fu-warn')return false;}
+    if(tf&&g.reqDate&&g.reqDate<tf)return false;
+    if(tt&&g.reqDate&&g.reqDate>tt)return false;
+    if(sf&&g.stayDate&&g.stayDate<sf)return false;
+    if(st2&&g.stayDate&&g.stayDate>st2)return false;
+    return true;
+  });
+}
+
+function rebuildLrFilter() {
+  const sel=document.getElementById('filter-lr'),cur=sel.value;
+  sel.innerHTML='<option value="">כל סיבות האי-סגירה</option>';
+  settings.lostReasons.forEach(r=>{const o=document.createElement('option');o.value=r.id;o.textContent=r.label;if(cur===r.id)o.selected=true;sel.appendChild(o);});
+}
+
+function renderTable() {
+  const fil=getFiltered(),pages=Math.ceil(fil.length/PER)||1;
+  if(currentPage>pages)currentPage=pages;
+  document.getElementById('tbl-count').textContent=`${fil.length} קבוצות`;
+  const pg=fil.slice((currentPage-1)*PER,currentPage*PER);
+
+  document.getElementById('groups-tbody').innerHTML=pg.map(g=>{
+    const fu=getFuStatus(g);
+    const lr=g.status==='lost'&&g.lostReason
+      ?`<span style="font-size:11px;font-weight:600;color:var(--red);background:var(--red-l);padding:2px 7px;border-radius:5px;border:1px solid rgba(220,38,38,.2)">${lrLabel(g.lostReason)}</span>`
+      :'<span style="color:var(--text3)">—</span>';
+    const rooms=(g.roomTypes||[]).slice(0,2).join(', ')+(g.roomTypes?.length>2?'…':'');
+    return `<tr class="${g.status==='cancelled'?'row-cancelled':''}">
+      <td><span style="font-weight:600;cursor:pointer" onclick="openDrawer(${g.id})">${g.name}</span>
+          ${g.agent?`<div style="font-size:11px;color:var(--text3)">${g.agent}</div>`:''}
+      </td>
+      <td>${srcBadge(g.source)}${g.webContact?` <span style="font-size:10px;color:var(--orange)" title="הגיע דרך אתר">🌐</span>`:''}
+      </td>
+      <td style="color:var(--text2);font-size:12px">${fmtDate(g.reqDate)}</td>
+      <td style="color:var(--text2);font-size:12px">${fmtDate(g.stayDate)}</td>
+      <td style="text-align:center;font-weight:600">${g.nights||'—'}</td>
+      <td style="text-align:center;font-weight:600">${g.rooms||'—'}</td>
+      <td style="text-align:center;font-weight:600">${g.guests||'—'}</td>
+      <td>${sBadge(g.status)}</td>
+      <td><span class="${fu.cls}">${fu.label||'—'}</span></td>
+      <td>${lr}</td>
+      <td style="font-size:11px;color:var(--text2);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${(g.notes||'').replace(/"/g,"'")}">${g.notes||'—'}</td>
+      <td><div class="row-actions">
+        <button class="icon-btn" onclick="openEdit(${g.id})" title="עריכה">✏</button>
+        <button class="icon-btn" onclick="openDrawer(${g.id})" title="פרטים">📋</button>
+        <button class="icon-btn del" onclick="deleteGroup(${g.id})" title="מחיקה">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('')||`<tr><td colspan="12" style="text-align:center;padding:44px;color:var(--text3)">אין נתונים תואמים</td></tr>`;
+
+  const pEl=document.getElementById('pagination');pEl.innerHTML='';
+  if(pages>1)for(let i=1;i<=pages;i++){const b=document.createElement('button');b.className='page-btn'+(i===currentPage?' active':'');b.textContent=i;b.onclick=()=>{currentPage=i;renderTable();};pEl.appendChild(b);}
+  document.getElementById('badge-fu').textContent=overdueGroups().length;
+}
+
+// ══════════════════════ ADD / EDIT ══════════════════════
+function buildRoomTypeChecks(selected=[]) {
+  document.getElementById('room-type-checks').innerHTML=(settings.roomTypes||[]).map(rt=>`
+    <label class="check-opt"><input type="checkbox" value="${rt}"${selected.includes(rt)?' checked':''}> ${rt}</label>`).join('');
+}
+
+function openAddModal() {
+  editingId=null;
+  document.getElementById('modal-title').textContent='הוספת קבוצה חדשה';
+  ['f-name','f-contact','f-phone','f-email','f-agent','f-stay-date','f-nights','f-rooms','f-guests','f-price-lodging','f-price-extras','f-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-req-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('f-status-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('f-source').value='miri';
+  document.getElementById('f-status').value='quote';
+  document.getElementById('f-web-contact').checked=false;
+  document.getElementById('f-dept-instructions').checked=false;
+  buildRoomTypeChecks([]);
+  buildLRGrid('');toggleLostReason();
+  document.getElementById('add-modal').classList.add('open');
+}
+
+function openEdit(id) {
+  const g=groups.find(x=>x.id===id);if(!g)return;
+  editingId=id;
+  document.getElementById('modal-title').textContent='עריכת קבוצה';
+  document.getElementById('f-name').value=g.name||'';
+  document.getElementById('f-contact').value=g.contact||'';
+  document.getElementById('f-phone').value=g.phone||'';
+  document.getElementById('f-email').value=g.email||'';
+  document.getElementById('f-source').value=g.source||'miri';
+  document.getElementById('f-agent').value=g.agent||'';
+  document.getElementById('f-web-contact').checked=g.webContact||false;
+  document.getElementById('f-dept-instructions').checked=g.deptInstructionsSent||false;
+  document.getElementById('f-req-date').value=g.reqDate||'';
+  document.getElementById('f-stay-date').value=g.stayDate||'';
+  document.getElementById('f-nights').value=g.nights||'';
+  document.getElementById('f-rooms').value=g.rooms||'';
+  document.getElementById('f-guests').value=g.guests||'';
+  document.getElementById('f-price-lodging').value=g.priceLodging||'';
+  document.getElementById('f-price-extras').value=g.priceExtras||'';
+  document.getElementById('f-status').value=g.status||'quote';
+  document.getElementById('f-status-date').value=g.statusDate||new Date().toISOString().split('T')[0];
+  document.getElementById('f-notes').value=g.notes||'';
+  buildRoomTypeChecks(g.roomTypes||[]);
+  buildLRGrid(g.lostReason||'');toggleLostReason();
+  document.getElementById('add-modal').classList.add('open');
+}
+
+function buildLRGrid(sel) {
+  document.getElementById('lost-reason-grid').innerHTML=settings.lostReasons.map(r=>`
+    <label class="lost-opt"><input type="radio" name="lost-reason" value="${r.id}"${sel===r.id?' checked':''}> ${r.label}</label>`).join('');
+}
+
+function toggleLostReason() {
+  document.getElementById('lost-section').style.display=document.getElementById('f-status').value==='lost'?'block':'none';
+}
+
+async function saveGroup() {
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){alert('יש להזין שם קבוצה');return;}
+  const status=document.getElementById('f-status').value;
+  const lostReason=status==='lost'?(document.querySelector('input[name="lost-reason"]:checked')?.value||''):'';
+  const roomTypes=[...document.querySelectorAll('#room-type-checks input:checked')].map(i=>i.value);
+  const newStatusDate=document.getElementById('f-status-date').value||new Date().toISOString().split('T')[0];
+
+  const data={
+    name,
+    contact:document.getElementById('f-contact').value,
+    phone:document.getElementById('f-phone').value,
+    email:document.getElementById('f-email').value,
+    source:document.getElementById('f-source').value,
+    agent:document.getElementById('f-agent').value,
+    webContact:document.getElementById('f-web-contact').checked,
+    deptInstructionsSent:document.getElementById('f-dept-instructions').checked,
+    reqDate:document.getElementById('f-req-date').value,
+    stayDate:document.getElementById('f-stay-date').value,
+    nights:parseInt(document.getElementById('f-nights').value)||0,
+    rooms:parseInt(document.getElementById('f-rooms').value)||0,
+    guests:parseInt(document.getElementById('f-guests').value)||0,
+    roomTypes,
+    priceLodging:parseInt(document.getElementById('f-price-lodging').value)||0,
+    priceExtras:parseInt(document.getElementById('f-price-extras').value)||0,
+    status, lostReason, statusDate: newStatusDate,
+    notes:document.getElementById('f-notes').value,
+  };
+
+  if(editingId) {
+    const idx=groups.findIndex(g=>g.id===editingId);
+    const ex=groups[idx];
+    data.id=editingId;
+    data._spId=ex._spId;
+    data.timeline=ex.timeline||[];
+    if(ex.status!==status) {
+      data.timeline.push({action:settings.statusLabels?.[status]||status, time:newStatusDate});
+    }
+    groups[idx]=data;
+    if(spMode) await saveGroupToSharePoint(data);
+  } else {
+    data.id=Date.now();
+    data.timeline=[{action:'פניה נוצרה',time:data.reqDate||new Date().toISOString().split('T')[0]},{action:settings.statusLabels?.['quote']||'נשלחה הצעת מחיר',time:data.reqDate||new Date().toISOString().split('T')[0]}];
+    if(spMode) await saveGroupToSharePoint(data);
+    groups.unshift(data);
+  }
+  saveData();closeModal('add-modal');renderTable();renderDashboard();
+}
+
+async function deleteGroup(id) {
+  if(!confirm('למחוק?'))return;
+  const g=groups.find(x=>x.id===id);
+  if(g && spMode && g._spId) await deleteGroupFromSharePoint(g._spId);
+  groups=groups.filter(g=>g.id!==id);
+  saveData();renderTable();renderDashboard();
+}
+
+// ══════════════════════ DRAWER ══════════════════════
+function openDrawer(id) {
+  const g=groups.find(x=>x.id===id);if(!g)return;
+  const fu=getFuStatus(g),lr=g.lostReason?lrLabel(g.lostReason):null;
+  const totalPrice=(g.priceLodging||0)+(g.priceExtras||0);
+  document.getElementById('drawer-content').innerHTML=`
+  <div style="padding-top:8px">
+    <div class="detail-name">${g.name}</div>
+    <div class="detail-meta">${srcBadge(g.source)} ${sBadge(g.status)}${g.webContact?`<span style="font-size:11px;background:var(--orange-l);color:var(--orange);padding:2px 8px;border-radius:6px;font-weight:600">🌐 אתר</span>`:''}</div>
+    ${g.contact||g.phone||g.email||g.agent?`<div class="detail-section"><div class="detail-section-title">פרטי קשר</div>
+      ${g.contact?`<div class="detail-row"><span class="detail-row-label">איש קשר</span><span>${g.contact}</span></div>`:''} 
+      ${g.phone?`<div class="detail-row"><span class="detail-row-label">טלפון</span><span>${g.phone}</span></div>`:''}
+      ${g.email?`<div class="detail-row"><span class="detail-row-label">אימייל</span><span style="color:var(--accent)">${g.email}</span></div>`:''}
+      ${g.agent?`<div class="detail-row"><span class="detail-row-label">סוכן</span><span>${g.agent}</span></div>`:''}
+    </div>`:''}
+    <div class="detail-section"><div class="detail-section-title">פרטי שהייה</div>
+      <div class="detail-row"><span class="detail-row-label">תאריך שהייה</span><span><strong>${fmtDate(g.stayDate)}</strong></span></div>
+      <div class="detail-row"><span class="detail-row-label">לילות</span><span>${g.nights||'—'}</span></div>
+      <div class="detail-row"><span class="detail-row-label">חדרים</span><span>${g.rooms||'—'}</span></div>
+      <div class="detail-row"><span class="detail-row-label">אורחים</span><span><strong>${g.guests||'—'}</strong></span></div>
+      <div class="detail-row"><span class="detail-row-label">סוגי חדרים</span><span style="text-align:left">${(g.roomTypes||[]).join(', ')||'—'}</span></div>
+    </div>
+    <div class="detail-section"><div class="detail-section-title">הצעת מחיר</div>
+      <div class="detail-row"><span class="detail-row-label">צפי לינה</span><span style="font-weight:700;color:var(--green)">₪${(g.priceLodging||0).toLocaleString('he-IL')}</span></div>
+      <div class="detail-row"><span class="detail-row-label">צפי תוספות</span><span style="font-weight:700;color:var(--teal)">₪${(g.priceExtras||0).toLocaleString('he-IL')}</span></div>
+      <div class="detail-row"><span class="detail-row-label">סה"כ צפי</span><span style="font-weight:800;font-size:15px;color:var(--accent)">₪${totalPrice.toLocaleString('he-IL')}</span></div>
+    </div>
+    <div class="detail-section"><div class="detail-section-title">פולו-אפ</div>
+      <div class="detail-row"><span class="detail-row-label">תאריך שינוי סטאטוס</span><span>${fmtDate(g.statusDate)}</span></div>
+      <div class="detail-row"><span class="detail-row-label">סטאטוס פולו-אפ</span><span class="${fu.cls}">${fu.label||'✓'}</span></div>
+      <div class="detail-row"><span class="detail-row-label">הנחיות למחלקות</span><span style="font-weight:600;color:${g.deptInstructionsSent?'var(--green)':'var(--text3)'}">${g.deptInstructionsSent?'✅ נשלחו':'⬜ טרם נשלחו'}</span></div>
+      ${lr?`<div class="detail-row"><span class="detail-row-label">סיבת אי-סגירה</span><span style="color:var(--red);font-weight:600">${lr}</span></div>`:''}
+    </div>
+    ${g.notes?`<div class="detail-section"><div class="detail-section-title">הערות</div><div style="font-size:13px;color:var(--text2);background:var(--surface2);border-radius:8px;padding:10px;line-height:1.6">${g.notes}</div></div>`:''}
+    <div class="detail-section"><div class="detail-section-title">היסטוריה</div>
+      <div class="timeline">${(g.timeline||[]).map(t=>`<div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><div class="tl-action">${t.action}</div><div class="tl-time">${fmtDate(t.time)}</div></div></div>`).join('')}</div>
+    </div>
+    <button class="btn btn-primary" onclick="openEdit(${g.id});closeDrawer()">✏ עריכה</button>
+  </div>`;
+  document.getElementById('detail-drawer').classList.add('open');
+}
+function closeDrawer(){document.getElementById('detail-drawer').classList.remove('open');}
+
+// ══════════════════════ EXPORT CSV ══════════════════════
+function exportCSV() {
+  const fil=getFiltered();
+  const h=['שם קבוצה','איש קשר','טלפון','אימייל','מקור','סוכן','בא דרך אתר','תאריך בקשה','תאריך שהייה','לילות','חדרים','אורחים','סוגי חדרים','סטאטוס','צפי לינה','צפי תוספות','סה"כ צפי','סיבת אי-סגירה','הערות'];
+  const rows=fil.map(g=>[
+    g.name,g.contact||'',g.phone||'',g.email||'',
+    settings.sourceLabels?.[g.source]||g.source,g.agent||'',
+    g.webContact?'כן':'לא',
+    g.reqDate||'',g.stayDate||'',g.nights||'',g.rooms||'',g.guests||'',
+    (g.roomTypes||[]).join(' | '),
+    settings.statusLabels?.[g.status]||g.status,
+    g.priceLodging||0,g.priceExtras||0,(g.priceLodging||0)+(g.priceExtras||0),
+    g.lostReason?lrLabel(g.lostReason):'',g.notes||''
+  ]);
+  const csv='\uFEFF'+[h,...rows].map(r=>r.map(c=>`"${c}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='eingev_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+
+// ══════════════════════ SETTINGS ══════════════════════
+function renderSettings() {
+  // Status tags (read-only)
+  document.getElementById('tags-status').innerHTML=Object.entries(settings.statusLabels||{}).map(([k,v])=>
+    `<span class="tag"><span style="width:8px;height:8px;border-radius:50%;background:${STATUS_COLORS[k]||'#888'}"></span>${v}</span>`).join('');
+
+  // Source tags
+  document.getElementById('tags-source').innerHTML=Object.entries(settings.sourceLabels||{}).map(([k,v])=>
+    `<span class="tag"><span style="width:8px;height:8px;border-radius:50%;background:${SOURCE_COLORS[k]||'#888'}"></span>${v}<span class="tag-del" onclick="removeTag('source','${k}')">✕</span></span>`).join('');
+
+  // Lost reason tags
+  document.getElementById('tags-lr').innerHTML=(settings.lostReasons||[]).map((r,i)=>
+    `<span class="tag">${r.label}<span class="tag-del" onclick="removeTag('lr',${i})">✕</span></span>`).join('');
+
+  // Room types
+  document.getElementById('tags-rooms').innerHTML=(settings.roomTypes||[]).map((r,i)=>
+    `<span class="tag">${r}<span class="tag-del" onclick="removeTag('room',${i})">✕</span></span>`).join('');
+
+  // Followup rules
+  renderFuSettings();
+}
+
+function renderFuSettings() {
+  const container=document.getElementById('fu-settings-container');
+  container.innerHTML=(settings.fuRules||[]).map((r,i)=>`
+    <div class="fu-card">
+      <div class="fu-card-title">
+        <span>⏰</span>
+        <input type="text" value="${r.label}" onchange="settings.fuRules[${i}].label=this.value;saveData()" style="flex:1;background:none;border:none;font-size:13px;font-weight:700;font-family:var(--font);color:var(--text);outline:none;">
+        <button class="btn btn-sm" onclick="removeFuRule(${i})" style="color:var(--red);border-color:rgba(220,38,38,.3)">הסר</button>
+      </div>
+      <div class="fu-row">
+        <span>התראה אחרי</span>
+        <input type="number" value="${r.hours}" min="1" max="9999" onchange="settings.fuRules[${i}].hours=parseInt(this.value);saveData()">
+        <select onchange="settings.fuRules[${i}].unit=this.value;saveData()">
+          <option value="hours" ${r.unit==='hours'?'selected':''}>שעות</option>
+          <option value="days"  ${r.unit==='days'?'selected':''}>ימים</option>
+        </select>
+        <span>מרגע</span>
+        <select onchange="settings.fuRules[${i}].trigger=this.value;saveData()">
+          <option value="quote"     ${r.trigger==='quote'?'selected':''}>שליחת הצעת מחיר</option>
+          <option value="precontract" ${r.trigger==='precontract'?'selected':''}>טרום הסכם</option>
+          <option value="signed"    ${r.trigger==='signed'?'selected':''}>הסכם חתום</option>
+          <option value="closed"    ${r.trigger==='closed'?'selected':''}>קבוצה סגורה</option>
+          <option value="arrival"   ${r.trigger==='arrival'?'selected':''}>לפני הגעה</option>
+        </select>
+      </div>
+    </div>`).join('');
+}
+
+function addFuRule() {
+  settings.fuRules.push({id:'fu_'+Date.now(),label:'פולו-אפ חדש',trigger:'quote',hours:48,unit:'hours'});
+  saveData();renderFuSettings();
+}
+function removeFuRule(i){settings.fuRules.splice(i,1);saveData();renderFuSettings();}
+
+function addTag(type) {
+  if(type==='source'){const v=document.getElementById('new-source').value.trim();if(!v)return;const k='src_'+Date.now();settings.sourceLabels[k]=v;settings.sources.push(k);document.getElementById('new-source').value='';}
+  else if(type==='lr'){const v=document.getElementById('new-lr').value.trim();if(!v)return;settings.lostReasons.push({id:'lr_'+Date.now(),label:v});document.getElementById('new-lr').value='';}
+  else if(type==='room'){const v=document.getElementById('new-room').value.trim();if(!v)return;settings.roomTypes.push(v);document.getElementById('new-room').value='';}
+  saveData();renderSettings();rebuildLrFilter();
+}
+function removeTag(type,key) {
+  if(type==='source'){delete settings.sourceLabels[key];settings.sources=settings.sources.filter(s=>s!==key);}
+  else if(type==='lr'){settings.lostReasons.splice(key,1);}
+  else if(type==='room'){settings.roomTypes.splice(key,1);}
+  saveData();renderSettings();rebuildLrFilter();
+}
+
+// ══════════════════════ UTILS ══════════════════════
+async function reconnectSP() {
+  showLoading(true);
+  spToken = null;
+  const token = await getSpToken();
+  if (token) {
+    const ok = await loadFromSharePoint();
+    if (ok) { spMode=true; showConnectionStatus(true); renderDashboard(); renderTable(); }
+    else { showConnectionStatus(false); }
+  } else { showConnectionStatus(false); }
+  showLoading(false);
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));closeDrawer();}});
+
+// ══════════════════════ INIT ══════════════════════
+function initDates() {
+  const b=monthBounds();
+  document.getElementById('db-date-from').value=b.from;
+  document.getElementById('db-date-to').value=b.to;
+  document.getElementById('tbl-from').value=b.from;
+  document.getElementById('tbl-to').value=b.to;
+}
+
+function init() {
+  initDates();
+  rebuildLrFilter();
+  renderDashboard();
+  renderTable();
+  renderSettings();
+}
+
+load();
+</script>
+</body>
+</html>
